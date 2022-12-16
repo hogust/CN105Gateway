@@ -1,3 +1,22 @@
+#include <WiFiClient.h>
+//#include <CertStoreBearSSL.h>
+//#include <WiFiClientSecure.h>
+//#include <ESP8266WiFiType.h>
+//#include <WiFiServerSecure.h>
+//#include <ESP8266WiFiMulti.h>
+//#include <ESP8266WiFiGratuitous.h>
+//#include <ESP8266WiFiSTA.h>
+//#include <ArduinoWiFiServer.h>
+//#include <ESP8266WiFiAP.h>
+#include <WiFiServer.h>
+//#include <ESP8266WiFiGeneric.h>
+//#include <BearSSLHelpers.h>
+//#include <WiFiClientSecureBearSSL.h>
+//#include <ESP8266WiFiScan.h>
+//#include <WiFiServerSecureBearSSL.h>
+//#include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
+
 
 
 
@@ -16,7 +35,7 @@
 //#include <ESP8266WebServer-impl.h>
 //#include <Parsing-impl.h>
 //#include <Uri.h>
-#include <WiFi.h>
+//#include <WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <NTPClient.h>
@@ -38,10 +57,10 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "nl.pool.ntp.org", 3600, 300000);
 ESP8266WebServer webServer(80);
 
-const char *ssid = SSID;                  // put in your ssid
-const char *password = WIFI_PASSWORD;     // put in your wifi password
-const char *mqtt_server = MQTT_SERVER_IP; // put in your ip-address 10.1.1.1
-const char *gatewayName = GATEWAYNAME;    // give your gateway a name
+const char* ssid = LOCAL_SSID;                  // put in your ssid
+const char* password = SECRET_WIFI_PASSWORD;     // put in your wifi password
+const char* mqtt_server = MQTT_SERVER_IP; // put in your ip-address 10.1.1.1
+const char* gatewayName = GATEWAYNAME;    // give your gateway a name
 
 char mqttData[250];                       // receiving mqtt data. Filled by ISR: mqttCallback
 char mqttTopic[250];                      // receiving mqtt topic. Filled by ISR: mqttCallback
