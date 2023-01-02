@@ -1,4 +1,4 @@
-#include <WiFiClient.h>
+//#include <WiFiClient.h>
 //#include <CertStoreBearSSL.h>
 //#include <WiFiClientSecure.h>
 //#include <ESP8266WiFiType.h>
@@ -8,14 +8,15 @@
 //#include <ESP8266WiFiSTA.h>
 //#include <ArduinoWiFiServer.h>
 //#include <ESP8266WiFiAP.h>
-#include <WiFiServer.h>
+//#include <WiFiServer.h>
 //#include <ESP8266WiFiGeneric.h>
 //#include <BearSSLHelpers.h>
 //#include <WiFiClientSecureBearSSL.h>
 //#include <ESP8266WiFiScan.h>
 //#include <WiFiServerSecureBearSSL.h>
 //#include <ESP8266WiFi.h>
-#include <WiFiUdp.h>
+//#include <WiFiUdp.h>
+
 
 
 
@@ -36,6 +37,7 @@
 //#include <Parsing-impl.h>
 //#include <Uri.h>
 //#include <WiFi.h>
+#include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <NTPClient.h>
@@ -60,6 +62,8 @@ ESP8266WebServer webServer(80);
 const char* ssid = LOCAL_SSID;                  // put in your ssid
 const char* password = SECRET_WIFI_PASSWORD;     // put in your wifi password
 const char* mqtt_server = MQTT_SERVER_IP; // put in your ip-address 10.1.1.1
+const char* MQTTuser = MQTT_USER;
+const char* MQTTpassword = MQTT_PASSWORD;
 const char* gatewayName = GATEWAYNAME;    // give your gateway a name
 
 char mqttData[250];                       // receiving mqtt data. Filled by ISR: mqttCallback
@@ -76,12 +80,13 @@ boolean connectedToHP = false;
 
 void setup()
 {
-  Serial1.begin(115200);
-  Serial1.println();
-  Serial1.setDebugOutput(true);
+  //Serial1.begin(115200, SERIAL_8N1);
+  //Serial1.println();
+  //Serial1.setDebugOutput(true);
   Serial.setRxBufferSize(SERIAL_SIZE_RX);
   Serial.begin(2400, SERIAL_8E1);
   Serial.swap();
+  //Serial1.println("Serial init");
   initWifi();
   mqttClient.setServer(mqtt_server, 1883);
   mqttClient.setCallback(mqttCallback);
@@ -693,14 +698,18 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
 {
   if (mqttCmdReceived)
   {
-    Serial1.println("Previous MQTT command not processed yet. Skipping this one");
+    Serial.swap();
+    Serial.println("Previous MQTT command not processed yet. Skipping this one");
+    Serial.swap();
   }
   else
   {
     strcpy(mqttTopic, topic);
     strncpy(mqttData, (char *)payload, length);
     mqttData[length] = '\0';
-    Serial1.println("MQTT command received");
+    Serial.swap();
+    Serial.println("MQTT command received");
+    Serial.swap();
   }
   mqttCmdReceived = true; // data is in mqttData[] and topic is in mqttTopic[]
 }
@@ -709,14 +718,18 @@ void reconnect()
   // Loop until we're reconnected
   while (!mqttClient.connected())
   {
-    Serial1.print("Attempting MQTT connection...");
+    Serial.swap();
+    Serial.print("Attempting MQTT connection...");
+    Serial.swap();
     // Attempt to connect
     char gatewayStatusTopic[100] = {'\0'};
     strcat(gatewayStatusTopic, gatewayName);
     strcat(gatewayStatusTopic, "/status");
-    if (mqttClient.connect(gatewayName, gatewayStatusTopic, MQTTQOS0, true, "Connection Lost"))
+    if (mqttClient.connect(gatewayName, MQTTuser, MQTTpassword, gatewayStatusTopic, MQTTQOS0, true, "Connection Lost"))
     {
-      Serial1.println("connected");
+      Serial.swap();
+      Serial.println("connected");
+      Serial.swap();
       // Once connected, publish an announcement...
       // ... and resubscribe
       char gatewaySubscribeTopic[100] = {'\0'};
@@ -726,12 +739,16 @@ void reconnect()
     }
     else
     {
-      Serial1.print("failed to connect to MQTT, rc=");
-      Serial1.print(mqttClient.state());
+      Serial.swap();
+      Serial.print("failed to connect to MQTT, rc=");
+      Serial.print(mqttClient.state());
+      Serial.swap();
       ++failedMqttConnect;
       if (failedMqttConnect > 500)
       {
-        Serial1.println(" Just reboot we lost the mqtt connection so badly");
+        Serial.swap();
+        Serial.println(" Just reboot we lost the mqtt connection so badly");
+        Serial.swap();
         delay(1000);
         ESP.restart();
       }
@@ -747,17 +764,23 @@ void checkWiFiConnection()
   {
     // wifi down, reconnect here
     WiFi.begin();
-    Serial1.println("WiFi disconnected, will try to reconnect");
+    Serial.swap();
+    Serial.println("WiFi disconnected, will try to reconnect");
+    Serial.swap();
     int WLcount = 0;
     int UpCount = 0;
     while (WiFi.status() != WL_CONNECTED && WLcount < 200)
     {
       delay(100);
-      Serial1.printf(".");
+      Serial.swap();
+      Serial.printf(".");
+      Serial.swap();
       if (UpCount >= 60) // just keep terminal from scrolling sideways
       {
         UpCount = 0;
-        Serial1.printf("\n");
+        Serial.swap();
+        Serial.printf("\n");
+        Serial.swap();
       }
       ++UpCount;
       ++WLcount;
@@ -801,8 +824,10 @@ void initWifi()
 {
   WiFi.setHostname(gatewayName);
   WiFi.mode(WIFI_STA);
-  Serial1.print("Connecting to ");
-  Serial1.print(ssid);
+  Serial.swap();
+  Serial.print("Connecting to ");
+  Serial.print(ssid);
+  Serial.swap();
   if (strcmp(WiFi.SSID().c_str(), ssid) != 0)
   {
     WiFi.begin(ssid, password);
@@ -811,21 +836,28 @@ void initWifi()
   while ((WiFi.status() != WL_CONNECTED) && (retries-- > 0))
   {
     delay(500);
-    Serial1.print(".");
+    Serial.swap();
+    Serial.print(".");
   }
-  Serial1.println("");
+  Serial.swap();
+  Serial.println("");
+  Serial.swap();
   if (retries < 1)
   {
-    Serial1.print("*** WiFi connection failed");
+    Serial.swap();
+    Serial.print("*** WiFi connection failed");
+    Serial.swap();
     ESP.restart();
   }
-  Serial1.print("WiFi connected, IP address: ");
-  Serial1.println(WiFi.localIP());
-  Serial1.print("STA mac: ");
-  Serial1.println(WiFi.macAddress());
-  Serial1.print("WiFi channel: ");
-  Serial1.println(WiFi.channel());
-  Serial1.println("Hostname " + String(gatewayName));
+  Serial.swap();
+  Serial.print("WiFi connected, IP address: ");
+  Serial.println(WiFi.localIP());
+  Serial.print("STA mac: ");
+  Serial.println(WiFi.macAddress());
+  Serial.print("WiFi channel: ");
+  Serial.println(WiFi.channel());
+  Serial.println("Hostname " + String(gatewayName));
+  Serial.swap();
 
 } // end initWifi
 void initOTA()
@@ -839,26 +871,34 @@ void initOTA()
           type = "filesystem";
 
         // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-        Serial1.println("Start updating " + type);
+        Serial.swap();
+        Serial.println("Start updating " + type);
+        Serial.swap();
       });
   ArduinoOTA.onEnd([]() {
-        Serial1.println("\nEnd");
+        Serial.swap();
+        Serial.println("\nEnd");
+        Serial.swap();
       });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-        Serial1.printf("Progress: %u%%\r", (progress / (total / 100)));
+        Serial.swap();
+        Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+        Serial.swap();
       });
   ArduinoOTA.onError([](ota_error_t error) {
-        Serial1.printf("Error[%u]: ", error);
+        Serial.swap();
+        Serial.printf("Error[%u]: ", error);
         if (error == OTA_AUTH_ERROR)
-          Serial1.println("Auth Failed");
+          Serial.println("Auth Failed");
         else if (error == OTA_BEGIN_ERROR)
-          Serial1.println("Begin Failed");
+          Serial.println("Begin Failed");
         else if (error == OTA_CONNECT_ERROR)
-          Serial1.println("Connect Failed");
+          Serial.println("Connect Failed");
         else if (error == OTA_RECEIVE_ERROR)
-          Serial1.println("Receive Failed");
+          Serial.println("Receive Failed");
         else if (error == OTA_END_ERROR)
-          Serial1.println("End Failed");
+          Serial.println("End Failed");
+        Serial.swap();
       });
 
   ArduinoOTA.begin();
@@ -889,7 +929,9 @@ void initWebserver()
   webServer.on("/cancelOTA", handleCancelUpdateOTA);
   webServer.onNotFound(handleNotFound);
   webServer.begin();
-  Serial1.println("HTTP server started");
+  Serial.swap();
+  Serial.println("HTTP server started");
+  Serial.swap();
   delay(10);
 }
 void handleUpdateOTA()
