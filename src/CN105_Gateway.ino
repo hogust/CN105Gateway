@@ -1,27 +1,3 @@
-//#include <WiFiClient.h>
-//#include <CertStoreBearSSL.h>
-//#include <WiFiClientSecure.h>
-//#include <ESP8266WiFiType.h>
-//#include <WiFiServerSecure.h>
-//#include <ESP8266WiFiMulti.h>
-//#include <ESP8266WiFiGratuitous.h>
-//#include <ESP8266WiFiSTA.h>
-//#include <ArduinoWiFiServer.h>
-//#include <ESP8266WiFiAP.h>
-//#include <WiFiServer.h>
-//#include <ESP8266WiFiGeneric.h>
-//#include <BearSSLHelpers.h>
-//#include <WiFiClientSecureBearSSL.h>
-//#include <ESP8266WiFiScan.h>
-//#include <WiFiServerSecureBearSSL.h>
-//#include <ESP8266WiFi.h>
-//#include <WiFiUdp.h>
-
-
-
-
-
-
 /*
    CN105_Gateway
    Connects Mutsubishi ecodan to MQTT
@@ -44,6 +20,11 @@
 #include <ESP8266HTTPClient.h> //#include <HTTPClient.h>
 //#include <WebServer.h>
 #include <ArduinoOTA.h>
+#include <WiFiManager.h>
+#include <strings_en.h>
+#include <wm_consts_en.h>
+#include <wm_strings_en.h>
+
 #include "CN105_Gateway.h"
 #include "passwords.h"
 
@@ -87,7 +68,8 @@ void setup()
   Serial.begin(2400, SERIAL_8E1);
   Serial.swap();
   //Serial1.println("Serial init");
-  initWifi();
+  //initWifi();
+  initWifiManager();
   mqttClient.setServer(mqtt_server, 1883);
   mqttClient.setCallback(mqttCallback);
   mqttClient.setBufferSize(1024);
@@ -822,7 +804,7 @@ void publishGatewayStatus()
 } //end publishGatewayStatus
 void initWifi()
 {
-  WiFi.setHostname(gatewayName);
+  WiFi.hostname(gatewayName);
   WiFi.mode(WIFI_STA);
   Serial.swap();
   Serial.print("Connecting to ");
@@ -860,6 +842,35 @@ void initWifi()
   Serial.swap();
 
 } // end initWifi
+
+void initWifiManager()
+{
+  WiFiManager wifiManager;
+  WiFi.mode(WIFI_STA);
+  bool res;
+  Serial.swap();
+  Serial.println("Starting WifiManager...");
+  wifiManager.setConnectTimeout(60);
+  wifiManager.setConfigPortalTimeout(180);
+  WiFi.hostname(gatewayName);
+  res = wifiManager.autoConnect(gatewayName);
+  if (!res) {
+        Serial.println("*** WiFi connection failed");
+    Serial.swap();
+    ESP.restart();
+  }
+  else {
+    Serial.print("WiFi connected, IP address: ");
+    Serial.println(WiFi.localIP());
+    Serial.print("STA mac: ");
+    Serial.println(WiFi.macAddress());
+    Serial.print("WiFi channel: ");
+    Serial.println(WiFi.channel());
+    Serial.println("Hostname " + String(gatewayName));
+    Serial.swap();
+  }
+} // end initWifiManager
+
 void initOTA()
 {
   ArduinoOTA.setHostname(gatewayName);
