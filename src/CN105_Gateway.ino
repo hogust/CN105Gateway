@@ -230,7 +230,7 @@ boolean encodeACMode(byte *sendBuffer, byte item, const char *command)
 }
 boolean encodeTemperature(byte *sendBuffer, byte item, const char *command)
 {
-  int temperature = atoi(command);
+  float temperature = atof(command);
   if (temperature > 70)
     return false;
   if (temperature < 0)
