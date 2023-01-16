@@ -14,6 +14,8 @@
 //#include <Uri.h>
 //#include <WiFi.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#include <WiFiUdp.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <NTPClient.h>
@@ -64,6 +66,8 @@ void setup()
   //Serial1.begin(115200, SERIAL_8N1);
   //Serial1.println();
   //Serial1.setDebugOutput(true);
+  pinMode(D1,OUTPUT);
+  digitalWrite(D1,HIGH);
   Serial.setRxBufferSize(SERIAL_SIZE_RX);
   Serial.begin(2400, SERIAL_8E1);
   Serial.swap();

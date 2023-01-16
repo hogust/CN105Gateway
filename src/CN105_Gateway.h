@@ -103,9 +103,11 @@ item items[] = {
     {GET_RESPONCE, 0x29, 4 + 5, VarType_TEMPERATURE, "Unkn", "Zone 1 Room Temp Setpoint2", "Zone1_Room_Temp_Setpoint2"},
     {GET_RESPONCE, 0x29, 6 + 5, VarType_TEMPERATURE, "Unkn", "Zone 2 Room Temp Setpoint2", "Zone2_Room_Temp_Setpoint2"},
     {GET_RESPONCE, 0xa1, 1 + 5, VarType_DATE, "Date", "Date Consumed Energy", "Date_Consumed_Energy"},
-    {GET_RESPONCE, 0xa1, 4 + 5, VarType_3BYTEVALUE, "Ener", "Consumed Energy Yesterday Kw", "Consumed_Energy_Yesterday_Kw"},
+    {GET_RESPONCE, 0xa1, 4 + 5, VarType_3BYTEVALUE, "Ener", "Consumed Heat Energy Yesterday kWh", "Consumed_Heat_Energy_Yesterday_kWh"},
+    {GET_RESPONCE, 0xa1, 10 + 5, VarType_3BYTEVALUE, "Ener", "Consumed DHW Energy Yesterday kWh", "Consumed_DHW_Energy_Yesterday_kWh"},
     {GET_RESPONCE, 0xa2, 1 + 5, VarType_DATE, "Date", "Date Produced Energy", "Date_Produced_Energy"},
-    {GET_RESPONCE, 0xa2, 4 + 5, VarType_3BYTEVALUE, "Date", "Produced Energy Yesterday Kw", "Produced_Energy_Yesterday_Kw"},
+    {GET_RESPONCE, 0xa2, 4 + 5, VarType_3BYTEVALUE, "Date", "Produced Heat Energy Yesterday kWh", "Produced_Heat_Energy_Yesterday_kWh"},
+    {GET_RESPONCE, 0xa2, 10 + 5, VarType_3BYTEVALUE, "Date", "Produced DHW Energy Yesterday kWh", "Produced_DHW_Energy_Yesterday_kWh"},
     {0, 0, 0, 0, " ", " "}};
 
 // working on the variables below
