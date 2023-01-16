@@ -9,6 +9,7 @@
 */
 //#include <ESP8266WebServerSecure.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266HTTPUpdateServer.h>
 //#include <ESP8266WebServer-impl.h>
 //#include <Parsing-impl.h>
 //#include <Uri.h>
@@ -41,6 +42,7 @@ WiFiClient Telnet;
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "nl.pool.ntp.org", 3600, 300000);
 ESP8266WebServer webServer(80);
+ESP8266HTTPUpdateServer httpUpdater;
 
 const char* ssid = LOCAL_SSID;                  // put in your ssid
 const char* password = SECRET_WIFI_PASSWORD;     // put in your wifi password
@@ -79,6 +81,7 @@ void setup()
   mqttClient.setBufferSize(1024);
   timeClient.begin();
   delay(10);
+  httpUpdater.setup(&webServer);
   initWebserver();
   initOTA();
   delay(100);
@@ -963,14 +966,15 @@ void handleRoot()
 {
   String message = "Hello from ";
   message += gatewayName;
-  message += "\n\nProgram: CN105_Gateway_V2.0\n";
+  message += "\n\nProgram: CN105_Gateway_V2.01\n";
   message += "Telnet to this device for logging output\n";
   message += "\nCurrent time: ";
   message += timeClient.getFormattedTime();
   message += "\nUsages:\n";
   message += "/                  - This messages\n";
-  message += "/updateOTA         - Put device in OTA programming mode\n";
+  message += "/updateOTA         - Put device in OTA programming mode via Arduino IDE\n";
   message += "/cancelOTA         - Cancel OTA programming mode\n";
+  message += "/update            - OTA update via web browser\n";
   message += "/restart           - Restarts the CN105 gateway\n\n";
   message += "Programming mode: ";
   message += flagOTA;
